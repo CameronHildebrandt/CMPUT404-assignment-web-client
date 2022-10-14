@@ -22,7 +22,16 @@ import sys
 import socket
 import re
 # you may use urllib to encode data appropriately
-import urllib.parse
+from urllib.parse import urlparse
+
+
+# from io import BytesIO # my import
+
+# class SocketConverter():
+#     def __init__(self, response_bytes):
+#         self._file = BytesIO(response_bytes)
+#     def makefile(self, *args, **kwargs):
+#         return self._file
 
 def help():
     print("httpclient.py [GET/POST] [URL]\n")
@@ -68,13 +77,86 @@ class HTTPClient(object):
         return buffer.decode('utf-8')
 
     def GET(self, url, args=None):
-        code = 500
-        body = ""
+        host = ""
+        path = "/"
+        port = 80
+
+        parsedUrl = urlparse(url)
+        print("parsed:", parsedUrl)
+
+        host = parsedUrl.netloc.split(":")[0] # what if not path?
+
+        if(parsedUrl.path): path = parsedUrl.path
+        if(parsedUrl.port): port = parsedUrl.port
+
+        req = "GET {host}{colon}{port}{path} HTTP/1.1\r\nHost: {host}\r\n\r\n".format(host=host, path=path, colon=":" if port else "", port=port)
+        print("req:", req)
+
+        try:
+            self.connect(host, port)
+        except:
+            print("====== connect failed, throwing 404 ======")
+            return HTTPResponse(404, "") # temp, likely want smarter error handling
+
+
+
+        self.socket.send(req.encode('utf-8'))
+        response = self.socket.recv(4096).decode('utf-8')
+
+        # print("res:", response)
+
+        # not going to be super stable - if there's a \r\n in the body it'll slice that too..
+        resArray = response.split("\r\n")
+
+        code = int(resArray[0].split(" ")[1])
+        body = resArray[-1]
+
+        print("responding with code:", code)
+        # print("responding with body:", body)
+
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
-        code = 500
-        body = ""
+        host = ""
+        path = "/"
+        port = 80
+
+        parsedUrl = urlparse(url)
+        print("parsed:", parsedUrl)
+
+        host = parsedUrl.netloc.split(":")[0] # what if not path?
+
+        if(parsedUrl.path): path = parsedUrl.path
+        if(parsedUrl.port): port = parsedUrl.port
+
+        content_type = "text/html"
+        content_length = str(10) # how to figure out, how to append the content?
+
+        req = "POST {host}{colon}{port}{path} HTTP/1.1\r\nHost: {host}\r\nContent-Type: {content_type}\r\nContent-Length: {content_length}\r\n\r\n".format(host=host, path=path, colon=":" if port else "", port=port, content_type=content_type, content_length=content_length)
+        print("req:", req)
+
+        try:
+            self.connect(host, port)
+        except:
+            print("====== connect failed, throwing 404 ======")
+            return HTTPResponse(404, "") # temp, likely want smarter error handling
+
+
+
+        self.socket.send(req.encode('utf-8'))
+        response = self.socket.recv(4096).decode('utf-8')
+
+        # print("res:", response)
+
+        # not going to be super stable - if there's a \r\n in the body it'll slice that too..
+        resArray = response.split("\r\n")
+
+        code = int(resArray[0].split(" ")[1])
+        body = resArray[-1]
+
+        print("responding with code:", code)
+        print("responding with body:", body)
+
         return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
