@@ -82,7 +82,7 @@ class HTTPClient(object):
         port = 80
 
         parsedUrl = urlparse(url)
-        print("parsed:", parsedUrl)
+        # print("parsed:", parsedUrl)
 
         host = parsedUrl.netloc.split(":")[0] # what if not path?
 
@@ -92,12 +92,12 @@ class HTTPClient(object):
 
         # {colon}{port}
         req = "GET {path} HTTP/1.1\r\nHost: {host}\r\n\r\n".format(host=host, path=path, colon=":" if port else "", port=port)
-        print("req:", req)
+        # print("req:", req)
 
         try:
             self.connect(host, port)
         except:
-            print("====== connect failed, throwing 404 ======")
+            # print("====== connect failed, throwing 404 ======")
             return HTTPResponse(404, "") # temp, likely want smarter error handling
 
 
@@ -113,8 +113,8 @@ class HTTPClient(object):
         code = int(resArray[0].split(" ")[1])
         body = resArray[-1]
 
-        print("responding with code:", code)
-        print("responding with body:", body)
+        # print("responding with code:", code)
+        # print("responding with body:", body)
 
         return HTTPResponse(code, body)
 
@@ -124,7 +124,7 @@ class HTTPClient(object):
         port = 80
 
         parsedUrl = urlparse(url)
-        print("parsed:", parsedUrl)
+        # print("parsed:", parsedUrl)
 
         host = parsedUrl.netloc.split(":")[0] # what if not path?
 
@@ -140,18 +140,16 @@ class HTTPClient(object):
 
         data += ("\n\n")
 
-        # print("=========", data)
-
         content_type = "text/html"
         content_length = str( len( data ) )
 
         req = "POST {path} HTTP/1.1\r\nHost: {host}\r\nContent-Type: {content_type}\r\nContent-Length: {content_length}\r\n\r\n{data}".format(host=host, path=path, colon=":" if port else "", port=port, content_type=content_type, content_length=content_length, data=data)
-        print("req:", req)
+        # print("req:", req)
 
         try:
             self.connect(host, port)
         except:
-            print("====== connect failed, throwing 404 ======")
+            # print("====== connect failed, throwing 404 ======")
             return HTTPResponse(404, "") # temp, likely want smarter error handling
 
 
@@ -167,8 +165,8 @@ class HTTPClient(object):
         code = int(resArray[0].split(" ")[1])
         body = resArray[-1]
 
-        print("responding with code:", code)
-        print("responding with body:", body)
+        # print("responding with code:", code)
+        # print("responding with body:", body)
 
         return HTTPResponse(code, body)
 
