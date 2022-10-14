@@ -132,13 +132,15 @@ class HTTPClient(object):
         if(parsedUrl.port): port = parsedUrl.port
 
         data = ""
-        first = True
-        for arg in args:
-            seperator = "" if first else "&"
-            data += (seperator + str(arg) + "=" + str(args[arg]))
-            first = False
 
-        data += ("\n\n")
+        if (args is not None):
+            first = True
+            for arg in args:
+                seperator = "" if first else "&"
+                data += (seperator + str(arg) + "=" + str(args[arg]))
+                first = False
+
+            data += ("\n\n")
 
         content_type = "text/html"
         content_length = str( len( data ) )
